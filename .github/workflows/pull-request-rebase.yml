@@ -8,10 +8,11 @@ jobs:
    runs-on: [re-centos7]
    steps:
     - name: say hello
-      if: contains(github.event.comment.body, '/support')   # check the comment if it contains the keywords
+      if: contains(github.event.comment.body, '/support')   # check the comment if it contains the keywo
       run: |
-       echo say hello
-    - name: test
-      if: contains(github.event.comment.body, '/test')  # check the comment if it contains the keywords
-      run: |
-       echo test
+        FROM_BRANCH=$(jq -r '.head.ref' <<< "${{ steps.pr_details.outputs.data }}")
+        TO_BRANCH=$(jq -r '.base.ref' <<< "${{ steps.pr_details.outputs.data }}")
+        git checkout $TO_BRANCH
+        git merge --squash $FROM_BRANCH
+        git commit -m "Squash commits from $FROM_BRANCH into $TO_BRANCH"
+        git push origin $TO_BRANCH
