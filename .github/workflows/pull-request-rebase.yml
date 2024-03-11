@@ -7,6 +7,16 @@ jobs:
    if: contains(github.event.comment.html_url, '/pull/')    # check if the comments come from pull request, exclude those from issue.
    runs-on: [ubuntu-latest]
    steps:
+    - name: Get pull request details
+      if: steps.check_comment.outputs.containsSquashCommand
+      id: pr_details
+      uses: octokit/request-action@v2.x
+      with:
+        route: GET /repos/:owner/:repo/pulls/:pull_number
+        owner: ${{ github.repository_owner }}
+        repo: ${{ github.event.repository.name }}
+        pull_number: ${{ github.event.issue.number }}
+
     - name: say hello
       if: contains(github.event.comment.body, '/support')   # check the comment if it contains the keywo
       run: |
